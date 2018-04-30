@@ -2,7 +2,9 @@ import React from 'react';
 import { renderToString } from 'react-dom/server';
 import { VIEW_MODE_WHISTLE, PARAM_VIEW_MODE } from '../shared/constants';
 import ServerHTML from './server-html';
-import universalRender from '../shared/UniversalRender';
+import universalRender, {
+    universalRenderSlowError,
+} from '../shared/UniversalRender';
 import models from 'db/models';
 import secureRandom from 'secure-random';
 import ErrorPage from 'server/server-error';
@@ -13,6 +15,8 @@ const path = require('path');
 const ROOT = path.join(__dirname, '../..');
 const DB_RECONNECT_TIMEOUT =
     process.env.NODE_ENV === 'development' ? 1000 * 60 * 60 : 1000 * 60 * 10;
+
+const universalRenderSlowErrorOutput = universalRenderSlowError();
 
 function getSupportedLocales() {
     const locales = [];
@@ -80,14 +84,20 @@ async function appRender(ctx) {
             },
         };
 
-        const { body, title, statusCode, meta } = await universalRender({
-            initial_state,
-            location: ctx.request.url,
-            store,
-            ErrorPage,
-            userPreferences,
-            offchain,
-        });
+        // Limit server-side render time
+        let { body, title, statusCode, meta } = await Promise.race([
+            universalRender({
+                initial_state,
+                location: ctx.request.url,
+                store,
+                ErrorPage,
+                userPreferences,
+                offchain,
+            }),
+            new Promise((resolve, reject) => {
+                setTimeout(resolve, 100, universalRenderSlowErrorOutput);
+            }),
+        ]);
 
         // Assets name are found in `webpack-stats` file
         const assets_filename =

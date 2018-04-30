@@ -453,4 +453,21 @@ async function universalRender({
     };
 }
 
+export function universalRenderSlowError() {
+    const server_store = createStore(rootReducer, {
+        offchain: {
+            config: $STM_Config,
+        },
+    });
+    const app = renderToString(<p>oops</p>);
+
+    return {
+        title: 'title',
+        titleBase: 'titleBase',
+        meta: [],
+        statusCode: 500,
+        body: Iso.render(app, server_store.getState()),
+    };
+}
+
 export default universalRender;
