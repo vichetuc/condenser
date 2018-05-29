@@ -30,15 +30,12 @@ class MarkdownViewer extends Component {
         text: React.PropTypes.string,
         className: React.PropTypes.string,
         large: React.PropTypes.bool,
-        // formId: React.PropTypes.string, // This is unique for every editor of every post (including reply or edit)
-        canEdit: React.PropTypes.bool,
         jsonMetadata: React.PropTypes.object,
         highQualityPost: React.PropTypes.bool,
         noImage: React.PropTypes.bool,
         allowDangerousHTML: React.PropTypes.bool,
         hideImages: React.PropTypes.bool, // whether to replace images with just a span containing the src url
         breaks: React.PropTypes.bool, // true to use bastardized markdown that cares about newlines
-        // used for the ImageUserBlockList
     };
 
     static defaultProps = {
@@ -58,8 +55,6 @@ class MarkdownViewer extends Component {
         return (
             np.text !== this.props.text ||
             np.large !== this.props.large ||
-            // np.formId !== this.props.formId ||
-            np.canEdit !== this.props.canEdit ||
             ns.allowNoImage !== this.state.allowNoImage
         );
     }
@@ -75,7 +70,8 @@ class MarkdownViewer extends Component {
         if (!text) text = ''; // text can be empty, still view the link meta data
         const {
             large,
-            /*formId, canEdit, jsonMetadata,*/ highQualityPost,
+            highQualityPost,
+            //jsonMetadata,
         } = this.props;
 
         let html = false;
