@@ -12,7 +12,6 @@ import {
     INVEST_TOKEN_SHORT,
 } from 'app/client_config';
 import FormattedAsset from 'app/components/elements/FormattedAsset';
-import shouldComponentUpdate from 'app/utils/shouldComponentUpdate';
 import {
     formatDecimal,
     parsePayoutAmount,
@@ -148,7 +147,6 @@ class Voting extends React.Component {
             }
             this.setState({ showWeight: !this.state.showWeight });
         };
-        this.shouldComponentUpdate = shouldComponentUpdate(this, 'Voting');
     }
 
     componentWillMount() {
