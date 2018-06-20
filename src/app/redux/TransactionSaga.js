@@ -806,7 +806,20 @@ function* recoverAccount({
             },
             [newOwnerPrivate]
         );
-        if (onSuccess) onSuccess();
+        // Reset all outgoing auto-vesting routes for this user. Condenser - #2835
+        const outgoingAutoVestingRoutes = yield call(
+          [api, api.getWithdrawRoutes],
+          [account.name, 'outgoing']
+        )
+        if (outgoingAutoVestingRoutes.length > 0) {
+          outgoingAutoVestingRoutes.map( ovr => {
+            yield call(
+              [api, api.setWithdrawVestingRoute],
+              [newActive, ovr.from_account, ovr.to_account, 0, true ]
+          )
+        })
+      }
+      if (onSuccess) onSuccess();
     } catch (error) {
         console.error('Recover account', error);
         if (onError) onError(error);
